@@ -1,0 +1,7 @@
+mountpoints:
+  /:
+    url: https://content.da.live/vidobe/accs5/
+    type: markup
+
+folders:
+  /products/: /products/default
