@@ -1,6 +1,7 @@
 {
   "public": {
     "default": {
+      "commerce-core-endpoint": "https://na1-sandbox.api.commerce.adobe.com/GR9ME1ZbVW5pKKUTNwdvfE/graphql",
       "commerce-endpoint": "https://na1-sandbox.api.commerce.adobe.com/GR9ME1ZbVW5pKKUTNwdvfE/graphql",
       "headers": {
         "all": {
@@ -12,7 +13,7 @@
           "Magento-Website-Code": "base"
         }
       },
-      "commerce-assets-enabled": true,
+      "commerce-assets-enabled": false,
       "analytics": {
         "base-currency-code": "USD",
         "environment": "Testing",
