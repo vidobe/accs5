@@ -122,7 +122,6 @@ const createPrizeIcon = () => {
   return wrapper;
 };
 
-
 const findReturnsTile = () => {
   const leaf = [...document.querySelectorAll('*')]
     .filter((el) => el.childElementCount === 0)
@@ -160,11 +159,10 @@ export default async function decorate(block) {
     return;
   }
 
-const rewardsTile = returnsTile.cloneNode(true);
-rewardsTile.classList.add('commerce-rewards-tile--prize');
-rewardsTile.setAttribute('data-commerce-rewards-tile', 'true');
-rewardsTile.href = '/customer/reward-points';
-  
+  const rewardsTile = returnsTile.cloneNode(true);
+  rewardsTile.classList.add('commerce-rewards-tile--prize');
+  rewardsTile.setAttribute('data-commerce-rewards-tile', 'true');
+  rewardsTile.href = '/customer/reward-points';
 
   // ✅ Robust icon swap: replace the FIRST svg in the tile
   const existingIconSvg = rewardsTile.querySelector('svg');
