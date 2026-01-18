@@ -45,8 +45,8 @@ export default async function decorate(block) {
 
     const response = await CORE_FETCH_GRAPHQL.query(query);
 
-    const rewardData = response?.data?.customer?.reward_points ||
-      response?.data?.customer?.reward_points_balance;
+    const rewardData = response?.data?.customer?.reward_points
+      || response?.data?.customer?.reward_points_balance;
 
     if (rewardData) {
       const { balance, currency_amount: currencyAmount } = rewardData;
