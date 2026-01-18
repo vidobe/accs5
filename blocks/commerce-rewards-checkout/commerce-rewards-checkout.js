@@ -96,40 +96,16 @@ const formatSubtitle = (balance, showMoney) => {
   const currency = balance && balance.money && balance.money.currency;
   const hasMoney = value !== undefined && value !== null && currency;
 
-  return hasMoney
-    ? `${points} pts (≈ ${value} ${currency})`
-    : `${points} pts`;
+  if (hasMoney) {
+    return `${points} pts (≈ ${value} ${currency})`;
+  }
+
+  return `${points} pts`;
 };
 
 const createPrizeIcon = () => {
   const wrapper = document.createElement('div');
-
-  wrapper.innerHTML = `
-    <svg
-      viewBox="0 0 24 24"
-      width="28"
-      height="28"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        fill="#f5c518"
-        stroke="none"
-        d="M12 2.5
-           L14.95 8.35
-           L21.4 9.25
-           L16.7 13.75
-           L17.9 20.15
-           L12 17
-           L6.1 20.15
-           L7.3 13.75
-           L2.6 9.25
-           L9.05 8.35
-           Z"
-      />
-    </svg>
-  `;
-
+  wrapper.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false"><path fill="#f5c518" stroke="none" d="M12 2.5 L14.95 8.35 L21.4 9.25 L16.7 13.75 L17.9 20.15 L12 17 L6.1 20.15 L7.3 13.75 L2.6 9.25 L9.05 8.35 Z"/></svg>';
   return wrapper;
 };
 
@@ -199,13 +175,9 @@ export default async function decorate(block) {
     titleNode.textContent = cfg.title;
   }
 
-  const leafs = [...rewardsTile.querySelectorAll('*')]
-    .filter((el) => el.childElementCount === 0);
-
+  const leafs = [...rewardsTile.querySelectorAll('*')].filter((el) => el.childElementCount === 0);
   const titleIndex = titleNode ? leafs.indexOf(titleNode) : -1;
-  const subtitleNode = titleIndex >= 0
-    ? leafs.slice(titleIndex + 1).find((n) => (n.textContent || '').trim().length)
-    : null;
+  const subtitleNode = titleIndex >= 0 ? leafs.slice(titleIndex + 1).find((n) => (n.textContent || '').trim().length) : null;
 
   if (subtitleNode) {
     subtitleNode.textContent = cfg.subtitleLoading;
