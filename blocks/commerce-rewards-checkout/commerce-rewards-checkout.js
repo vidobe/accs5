@@ -13,10 +13,9 @@ const REWARDS_QUERY = `
   }
 `;
 
-// Common mutation names (depends on your Commerce version)
 const APPLY_REWARDS_MUTATION = `
-  mutation ApplyRewardPoints($cartId: String!) {
-    applyRewardPointsToCart(cart_id: $cartId) {
+  mutation ApplyRewardPoints($cartId: ID!) {
+    applyRewardPointsToCart(cartId: $cartId) {
       cart {
         id
       }
@@ -25,8 +24,8 @@ const APPLY_REWARDS_MUTATION = `
 `;
 
 const REMOVE_REWARDS_MUTATION = `
-  mutation RemoveRewardPoints($cartId: String!) {
-    removeRewardPointsFromCart(cart_id: $cartId) {
+  mutation RemoveRewardPoints($cartId: ID!) {
+    removeRewardPointsFromCart(cartId: $cartId) {
       cart {
         id
       }
@@ -41,18 +40,35 @@ const DEFAULTS = {
   removeLabel: 'Remove tokens',
 };
 
+const CART_ID_STORAGE_KEY = 'commerce_cart_id';
+const REWARDS_APPLIED_KEY = 'rewards_applied';
+
 const readConfig = (block) => ([...block.querySelectorAll(':scope > div')]
   .map((row) => [...row.children])
   .filter((cols) => cols.length >= 2)
   .reduce((acc, cols) => {
     const key = (cols[0].textContent || '').trim();
     const val = (cols[1].textContent || '').trim();
-    if (!key) return acc;
 
-    if (key === 'title') return { ...acc, title: val || DEFAULTS.title };
-    if (key === 'description') return { ...acc, description: val || DEFAULTS.description };
-    if (key === 'applyLabel') return { ...acc, applyLabel: val || DEFAULTS.applyLabel };
-    if (key === 'removeLabel') return { ...acc, removeLabel: val || DEFAULTS.removeLabel };
+    if (!key) {
+      return acc;
+    }
+
+    if (key === 'title') {
+      return { ...acc, title: val || DEFAULTS.title };
+    }
+
+    if (key === 'description') {
+      return { ...acc, description: val || DEFAULTS.description };
+    }
+
+    if (key === 'applyLabel') {
+      return { ...acc, applyLabel: val || DEFAULTS.applyLabel };
+    }
+
+    if (key === 'removeLabel') {
+      return { ...acc, removeLabel: val || DEFAULTS.removeLabel };
+    }
 
     return acc;
   }, { ...DEFAULTS }));
@@ -74,24 +90,6 @@ const getCustomerToken = () => {
     || null;
 };
 
-// Best-effort cart id lookup for boilerplate/dev:
-// adjust if you already know your cart id storage key
-const getCartId = () => {
-  const fromLs = window.localStorage.getItem('cartId')
-    || window.localStorage.getItem('commerce_cart_id')
-    || window.localStorage.getItem('cart_id');
-
-  const fromSs = window.sessionStorage.getItem('cartId')
-    || window.sessionStorage.getItem('commerce_cart_id')
-    || window.sessionStorage.getItem('cart_id');
-
-  const fromCookie = getCookie('cartId')
-    || getCookie('commerce_cart_id')
-    || getCookie('cart_id');
-
-  return fromLs || fromSs || fromCookie || null;
-};
-
 const gql = async ({ query, variables, token }) => {
   const res = await fetch(GRAPHQL_ENDPOINT, {
     method: 'POST',
@@ -104,22 +102,18 @@ const gql = async ({ query, variables, token }) => {
   });
 
   const json = await res.json();
+
   if (json.errors && json.errors.length) {
     throw new Error(json.errors.map((e) => e.message).join(' | '));
   }
+
   return json.data;
 };
 
 const createStarIcon = () => {
   const wrap = document.createElement('span');
   wrap.className = 'commerce-rewards-checkout__icon';
-  wrap.innerHTML = `
-    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">
-      <path fill="#f5c518" stroke="none"
-        d="M12 2.5 L14.95 8.35 L21.4 9.25 L16.7 13.75 L17.9 20.15
-           L12 17 L6.1 20.15 L7.3 13.75 L2.6 9.25 L9.05 8.35 Z"/>
-    </svg>
-  `;
+  wrap.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path fill="#f5c518" stroke="none" d="M12 2.5 L14.95 8.35 L21.4 9.25 L16.7 13.75 L17.9 20.15 L12 17 L6.1 20.15 L7.3 13.75 L2.6 9.25 L9.05 8.35 Z"/></svg>';
   return wrap;
 };
 
@@ -128,11 +122,98 @@ const formatBalanceLine = (balance) => {
   const v = balance && balance.money && balance.money.value;
   const c = balance && balance.money && balance.money.currency;
   const hasMoney = v !== undefined && v !== null && c;
-  return hasMoney ? `${pts} pts (≈ ${v} ${c}) available` : `${pts} pts available`;
+
+  if (hasMoney) {
+    return `${pts} pts (≈ ${v} ${c}) available`;
+  }
+
+  return `${pts} pts available`;
 };
+
+// ---- Cart ID capture (no endpoint switch) ----
+// Checkout already calls /graphql and includes variables.cartId.
+// We intercept those requests and store the cart id.
+const extractCartIdFromGraphqlBody = (bodyObj) => {
+  const vars = bodyObj && bodyObj.variables;
+  const input = vars && vars.input;
+  const cartFromVars = vars && (vars.cartId || vars.cart_id);
+  const cartFromInput = input && input.cart_id;
+
+  return cartFromVars || cartFromInput || null;
+};
+
+const initCartIdSniffer = () => {
+  if (window.__commerceCartIdSnifferInstalled) {
+    return;
+  }
+
+  window.__commerceCartIdSnifferInstalled = true;
+
+  const originalFetch = window.fetch.bind(window);
+
+  window.fetch = async (...args) => {
+    try {
+      const url = args && args[0] ? String(args[0]) : '';
+      const opts = args && args[1] ? args[1] : {};
+      const isGraphql = url.includes('/graphql') || url.endsWith('/graphql');
+
+      if (isGraphql && opts && typeof opts.body === 'string') {
+        const parsed = JSON.parse(opts.body);
+        const found = extractCartIdFromGraphqlBody(parsed);
+
+        if (found) {
+          window.sessionStorage.setItem(CART_ID_STORAGE_KEY, found);
+          window.__commerceCartId = found;
+        }
+      }
+    } catch (e) {
+      // Ignore parsing issues; never break checkout fetch.
+    }
+
+    return originalFetch(...args);
+  };
+};
+
+const getCartId = () => window.sessionStorage.getItem(CART_ID_STORAGE_KEY)
+  || window.__commerceCartId
+  || window.localStorage.getItem('cartId')
+  || window.localStorage.getItem('cart_id')
+  || window.localStorage.getItem('commerce_cart_id')
+  || window.sessionStorage.getItem('cartId')
+  || window.sessionStorage.getItem('cart_id')
+  || getCookie('cartId')
+  || getCookie('cart_id')
+  || getCookie('commerce_cart_id')
+  || null;
+
+const waitForCartId = () => new Promise((resolve) => {
+  const start = Date.now();
+  const maxMs = 4000;
+
+  const tick = () => {
+    const id = getCartId();
+
+    if (id) {
+      resolve(id);
+      return;
+    }
+
+    if (Date.now() - start > maxMs) {
+      resolve(null);
+      return;
+    }
+
+    window.setTimeout(tick, 150);
+  };
+
+  tick();
+});
 
 export default async function decorate(block) {
   const cfg = readConfig(block);
+
+  // Install sniffer early so we capture the cartId from checkout GraphQL calls
+  initCartIdSniffer();
 
   block.textContent = '';
   block.classList.add('commerce-rewards-checkout');
@@ -171,16 +252,16 @@ export default async function decorate(block) {
   block.append(panel);
 
   const token = getCustomerToken();
+
   if (!token) {
     status.textContent = 'Sign in to use reward points.';
     return;
   }
 
-  // Load balance to decide if button should be enabled
-  let balance = null;
+  // Load balance first
   try {
     const data = await gql({ query: REWARDS_QUERY, variables: {}, token });
-    balance = data
+    const balance = data
       && data.customer
       && data.customer.reward_points
       && data.customer.reward_points.balance;
@@ -197,44 +278,41 @@ export default async function decorate(block) {
     return;
   }
 
-  // simple toggle state (per-session)
-  const storageKey = 'rewards_applied';
-  const applied = window.sessionStorage.getItem(storageKey) === 'true';
+  const applied = window.sessionStorage.getItem(REWARDS_APPLIED_KEY) === 'true';
   btn.textContent = applied ? cfg.removeLabel : cfg.applyLabel;
 
   btn.addEventListener('click', async () => {
-    const cartId = getCartId();
-    if (!cartId) {
-      status.textContent = 'Couldn’t find cart id (cart_id).';
-      return;
-    }
-
     btn.disabled = true;
     btn.textContent = 'Applying…';
 
+    const cartId = await waitForCartId();
+
+    if (!cartId) {
+      status.textContent = 'Couldn’t find cart id yet. Try again in a second.';
+      btn.disabled = false;
+      btn.textContent = window.sessionStorage.getItem(REWARDS_APPLIED_KEY) === 'true'
+        ? cfg.removeLabel
+        : cfg.applyLabel;
+      return;
+    }
+
     try {
-      if (window.sessionStorage.getItem(storageKey) === 'true') {
-        await gql({
-          query: REMOVE_REWARDS_MUTATION,
-          variables: { cartId },
-          token,
-        });
-        window.sessionStorage.setItem(storageKey, 'false');
+      const isApplied = window.sessionStorage.getItem(REWARDS_APPLIED_KEY) === 'true';
+
+      if (isApplied) {
+        await gql({ query: REMOVE_REWARDS_MUTATION, variables: { cartId }, token });
+        window.sessionStorage.setItem(REWARDS_APPLIED_KEY, 'false');
       } else {
-        await gql({
-          query: APPLY_REWARDS_MUTATION,
-          variables: { cartId },
-          token,
-        });
-        window.sessionStorage.setItem(storageKey, 'true');
+        await gql({ query: APPLY_REWARDS_MUTATION, variables: { cartId }, token });
+        window.sessionStorage.setItem(REWARDS_APPLIED_KEY, 'true');
       }
 
-      // simplest reliable way to refresh totals and UI
+      // Refresh totals the simplest reliable way
       window.location.reload();
     } catch (e) {
       status.textContent = `Couldn’t apply reward points: ${String(e.message || e)}`;
       btn.disabled = false;
-      btn.textContent = window.sessionStorage.getItem(storageKey) === 'true'
+      btn.textContent = window.sessionStorage.getItem(REWARDS_APPLIED_KEY) === 'true'
         ? cfg.removeLabel
         : cfg.applyLabel;
     }
