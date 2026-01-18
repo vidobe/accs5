@@ -36,10 +36,7 @@
   color: #f5c518;    /* warm reward yellow */
 }
 
-/* Optional: slightly stronger on hover (feels premium) */
-.commerce-rewards-tile--prize:hover svg {
-  color: #e6b800;
-}
+
 
 /* Ensure alignment stays identical */
 .commerce-rewards-tile--prize .account-tile__icon,
@@ -47,4 +44,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Optional: slightly stronger on hover (feels premium) */
+.commerce-rewards-tile--prize:hover svg {
+  color: #e6b800;
 }
