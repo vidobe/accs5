@@ -2,30 +2,140 @@
   margin-top: var(--spacing-xbig);
 }
 
+/* Grid */
 .cards > ul {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(257px, 1fr));
-  gap: var(--spacing-medium);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
 }
 
+@media (max-width: 1100px) {
+  .cards > ul {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .cards > ul {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card container */
 .cards > ul > li {
-  border: var(--shape-border-width-1) solid var(--color-neutral-500);
-  background-color: var(--background-color);
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
-.cards .cards-card-body {
-  margin: var(--spacing-small);
+.cards > ul > li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
 }
 
+/* Image */
 .cards .cards-card-image {
   line-height: 0;
 }
 
 .cards > ul > li img {
+  display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: 200px;          /* match the “news card” feel */
   object-fit: cover;
+}
+
+/* Body */
+.cards .cards-card-body {
+  padding: 18px 18px 16px;
+  margin: 0; /* remove old margin */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 170px; /* keeps cards aligned */
+}
+
+/* Title (first heading in body) */
+.cards .cards-card-body h1,
+.cards .cards-card-body h2,
+.cards .cards-card-body h3,
+.cards .cards-card-body h4 {
+  margin: 0;
+  font-size: 26px;
+  line-height: 1.15;
+  font-weight: 800;
+  color: #0b4aa2; /* news-blue */
+}
+
+/* Description (first paragraph after title) */
+.cards .cards-card-body p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  color: #111;
+  opacity: 0.9;
+}
+
+/* Clamp text so cards look tidy */
+.cards .cards-card-body h1,
+.cards .cards-card-body h2,
+.cards .cards-card-body h3,
+.cards .cards-card-body h4,
+.cards .cards-card-body p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cards .cards-card-body h1,
+.cards .cards-card-body h2,
+.cards .cards-card-body h3,
+.cards .cards-card-body h4 {
+  -webkit-line-clamp: 2;
+}
+
+.cards .cards-card-body p {
+  -webkit-line-clamp: 3;
+}
+
+/* Links / CTA */
+.cards .cards-card-body a {
+  color: #0b4aa2;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.cards .cards-card-body a:hover {
+  text-decoration: underline;
+}
+
+/* Optional: style a “tag pill” if author adds a <strong>Tag</strong> line */
+.cards .cards-card-body strong {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #e3002b; /* red pill */
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* Optional: style “date” if author puts it in an <em> */
+.cards .cards-card-body em {
+  font-style: normal;
+  font-size: 13px;
+  color: #666;
+}
+
+/* Footer row: if last element is a link, push it down */
+.cards .cards-card-body > :last-child {
+  margin-top: auto;
 }
