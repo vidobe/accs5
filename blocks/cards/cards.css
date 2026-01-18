@@ -2,7 +2,7 @@
   margin-top: var(--spacing-xbig);
 }
 
-/* Grid */
+/* Grid like the news example */
 .cards > ul {
   list-style: none;
   margin: 0;
@@ -24,13 +24,13 @@
   }
 }
 
-/* Card container */
+/* Card shell */
 .cards > ul > li {
   border: 1px solid #e5e5e5;
   background: #fff;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
   transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
@@ -47,33 +47,33 @@
 .cards > ul > li img {
   display: block;
   width: 100%;
-  height: 200px;          /* match the “news card” feel */
+  height: 190px;
   object-fit: cover;
 }
 
 /* Body */
 .cards .cards-card-body {
   padding: 18px 18px 16px;
-  margin: 0; /* remove old margin */
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-height: 170px; /* keeps cards aligned */
+  gap: 12px;
+  min-height: 200px;
 }
 
-/* Title (first heading in body) */
+/* Title (first heading) */
 .cards .cards-card-body h1,
 .cards .cards-card-body h2,
 .cards .cards-card-body h3,
 .cards .cards-card-body h4 {
   margin: 0;
-  font-size: 26px;
+  font-size: 28px;
   line-height: 1.15;
   font-weight: 800;
-  color: #0b4aa2; /* news-blue */
+  color: #0b4aa2;
 }
 
-/* Description (first paragraph after title) */
+/* Description */
 .cards .cards-card-body p {
   margin: 0;
   font-size: 16px;
@@ -82,7 +82,7 @@
   opacity: 0.9;
 }
 
-/* Clamp text so cards look tidy */
+/* Clamp title + description like the example */
 .cards .cards-card-body h1,
 .cards .cards-card-body h2,
 .cards .cards-card-body h3,
@@ -104,38 +104,61 @@
   -webkit-line-clamp: 3;
 }
 
-/* Links / CTA */
-.cards .cards-card-body a {
-  color: #0b4aa2;
-  font-weight: 700;
-  text-decoration: none;
+/* Meta row (tag + date) */
+.cards .cards-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.cards .cards-card-body a:hover {
-  text-decoration: underline;
-}
-
-/* Optional: style a “tag pill” if author adds a <strong>Tag</strong> line */
-.cards .cards-card-body strong {
+.cards .cards-card-tag {
   display: inline-flex;
   align-items: center;
-  padding: 6px 10px;
+  padding: 8px 12px;
   border-radius: 10px;
-  background: #e3002b; /* red pill */
+  background: #e3002b;
   color: #fff;
   font-size: 13px;
   font-weight: 800;
   line-height: 1;
+  white-space: nowrap;
 }
 
-/* Optional: style “date” if author puts it in an <em> */
-.cards .cards-card-body em {
-  font-style: normal;
+.cards .cards-card-date {
   font-size: 13px;
   color: #666;
+  white-space: nowrap;
 }
 
-/* Footer row: if last element is a link, push it down */
-.cards .cards-card-body > :last-child {
+/* Footer "Lees meer" */
+.cards .cards-card-footer {
   margin-top: auto;
+}
+
+.cards .cards-card-readmore {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #0b4aa2;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.cards .cards-card-readmore:hover {
+  text-decoration: underline;
+}
+
+.cards .cards-card-arrow {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  border: 2px solid #0b4aa2;
+  border-radius: 999px;
+  align-items: center;
+  justify-content: center;
+}
+
+.cards .cards-card-arrow svg {
+  display: block;
 }

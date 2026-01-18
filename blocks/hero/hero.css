@@ -5,29 +5,84 @@
 
 .hero {
   position: relative;
+  height: 60vh;
+  min-height: 600px;
   padding: 40px 24px;
-  min-height: 850px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Title stays centered */
 .hero h1 {
   max-width: 1200px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
   color: var(--background-color);
+  text-align: center;
+  z-index: 1;
 }
 
+/* Background image */
 .hero picture {
   position: absolute;
-  z-index: -1;
   inset: 0;
-  object-fit: cover;
-  box-sizing: border-box;
+  z-index: -1;
 }
 
 .hero img {
-  object-fit: cover;
   width: 100%;
   height: 100%;
+  object-fit: cover;
+}
+
+/* ========================= */
+/* CTA BUTTON (BOTTOM CENTER) */
+/* ========================= */
+
+.hero h1 > a {
+  position: absolute;
+  left: 50%;
+  bottom: 48px;                 /* distance from bottom */
+  transform: translateX(-50%);
+  z-index: 2;
+
+  background-color: #0a8f08;    /* green */
+  color: #fff;
+  padding: 16px 32px;
+  border-radius: 8px;
+
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: none;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  box-shadow: 0 6px 0 #066906;  /* subtle depth */
+}
+
+/* Arrow */
+.hero h1 > a::after {
+  content: '›';
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* Hover / focus */
+.hero h1 > a:hover {
+  background-color: #087c07;
+  box-shadow: 0 4px 0 #055a05;
+  transform: translateX(-50%) translateY(1px);
+}
+
+/* Mobile tuning */
+@media (max-width: 600px) {
+  .hero h1 > a {
+    bottom: 24px;
+    padding: 14px 24px;
+    font-size: 16px;
+  }
 }
 
 @media (min-width: 900px) {

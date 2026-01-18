@@ -19,8 +19,8 @@ header nav {
   box-sizing: border-box;
   display: grid;
   grid-template:
-  'hamburger brand tools wrapperPopUpButton' var(--nav-height)
-  'sections sections sections ...' 1fr / auto 1fr auto auto;
+    'hamburger brand tools wrapperPopUpButton' var(--nav-height)
+    'sections sections sections ...' 1fr / auto 1fr auto auto;
   align-items: center;
   gap: 0 16px;
   margin: auto;
@@ -771,3 +771,103 @@ li
   max-height: 15rem;
 }
 
+/* ========================================================================== */
+/* Header theme override (red bg, white text/icons) - affects header only     */
+/* ========================================================================== */
+
+header .nav-wrapper {
+  background-color: #e30027;
+  border-bottom: none;
+}
+
+/* White text in the top bar */
+header nav,
+header nav a,
+header nav p {
+  color: #fff;
+}
+
+/* Hamburger button should stay transparent */
+header nav .nav-hamburger button {
+  background-color: transparent;
+  color: #fff;
+}
+
+/* Top-level nav links */
+header nav .nav-sections > ul > li > a {
+  color: #fff;
+}
+
+/* Tools row stays red/transparent (do NOT paint panels) */
+header nav .nav-tools {
+  background: transparent;
+}
+
+header nav .nav-tools-panel,
+header nav .nav-tools-panel * {
+  color: initial;
+}
+
+/* Make cart/heart/search background-image icons render as white (no white boxes) */
+header nav .nav-tools button.nav-cart-button,
+header nav .nav-tools button.nav-wishlist-button,
+header nav .nav-tools button.nav-search-button {
+  background-image: none !important;
+  position: relative;
+}
+
+header nav .nav-tools button.nav-cart-button::before,
+header nav .nav-tools button.nav-wishlist-button::before,
+header nav .nav-tools button.nav-search-button::before {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 22px;
+  margin: auto;
+  background-color: #fff;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}
+
+header nav .nav-tools button.nav-cart-button::before {
+  -webkit-mask-image: url('../../icons/cart.svg');
+  mask-image: url('../../icons/cart.svg');
+}
+
+header nav .nav-tools button.nav-wishlist-button::before {
+  -webkit-mask-image: url('../../icons/heart.svg');
+  mask-image: url('../../icons/heart.svg');
+}
+
+header nav .nav-tools button.nav-search-button::before {
+  -webkit-mask-image: url('../../icons/search.svg');
+  mask-image: url('../../icons/search.svg');
+}
+
+/* Cart badge inverted: white badge with red number */
+header nav .nav-tools button.nav-cart-button[data-count]::after {
+  background-color: #fff;
+  color: #e30027;
+}
+
+/* Account icon is inline SVG with hard-coded stroke="#000" -> force white */
+header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button {
+  color: #fff;
+}
+
+header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg,
+header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg * {
+  stroke: #fff !important;
+  fill: none !important;
+}
+
+/* Optional: subtle hover */
+header nav .nav-tools-wrapper > button:hover,
+header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button:hover,
+header nav .nav-sections > ul > li > a:hover {
+  opacity: 0.9;
+}
