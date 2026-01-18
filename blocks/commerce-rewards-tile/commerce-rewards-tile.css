@@ -1,37 +1,30 @@
-.reward-balance {
-  margin: 0;
-}
-
-.reward-balance__card {
+.commerce-rewards-tile__card {
   border: 1px solid var(--color-border, #e5e5e5);
   border-radius: 12px;
   padding: 14px 16px;
   background: var(--color-background, #fff);
 }
 
-.reward-balance__title {
+.commerce-rewards-tile__title {
   font-weight: 600;
   font-size: 16px;
   line-height: 1.25;
   margin-bottom: 10px;
 }
 
-.reward-balance__body {
-  display: grid;
-  gap: 6px;
-}
-
-.reward-balance__status {
+.commerce-rewards-tile__status {
   font-size: 14px;
   opacity: 0.8;
 }
 
-.reward-balance__points {
+.commerce-rewards-tile__points {
+  margin-top: 6px;
   font-size: 22px;
   font-weight: 600;
 }
 
-.reward-balance__approx {
+.commerce-rewards-tile__approx {
+  margin-top: 4px;
   font-size: 14px;
   opacity: 0.8;
 }

@@ -1,20 +1,5 @@
-/**
- * Authorable block: reward-balance
- *
- * Optional authoring rows:
- * | reward-balance |
- * |---|
- * | title | Reward points |
- * | showMoney | true |
- */
-
 const GRAPHQL_ENDPOINT =
   'https://na1-sandbox.api.commerce.adobe.com/GR9ME1ZbVW5pKKUTNwdvfE/graphql';
-
-const DEFAULTS = {
-  title: 'Reward points',
-  showMoney: true,
-};
 
 const REWARDS_QUERY = `
   query RewardsBalance {
@@ -29,105 +14,103 @@ const REWARDS_QUERY = `
   }
 `;
 
-function readBlockConfig(block) {
-  const config = { ...DEFAULTS };
-  const rows = [...block.querySelectorAll(':scope > div')];
+const DEFAULTS = {
+  title: 'Reward points',
+  showMoney: true,
+};
 
-  for (const row of rows) {
-    const cols = [...row.children];
-    if (cols.length < 2) continue;
+const readConfig = (block) =>
+  [...block.querySelectorAll(':scope > div')]
+    .map((row) => [...row.children])
+    .filter((cols) => cols.length >= 2)
+    .reduce((acc, cols) => {
+      const key = (cols[0].textContent || '').trim();
+      const val = (cols[1].textContent || '').trim();
 
-    const key = (cols[0].textContent || '').trim();
-    const val = (cols[1].textContent || '').trim();
+      if (!key) return acc;
 
-    if (!key) continue;
+      if (key === 'title') return { ...acc, title: val || DEFAULTS.title };
+      if (key === 'showMoney') return { ...acc, showMoney: val.toLowerCase() !== 'false' };
 
-    if (key === 'title') config.title = val || DEFAULTS.title;
-    if (key === 'showMoney') config.showMoney = val.toLowerCase() !== 'false';
-  }
+      return acc;
+    }, { ...DEFAULTS });
 
-  return config;
-}
-
-function getCookie(name) {
-  return document.cookie
+const getCookie = (name) =>
+  document.cookie
     .split('; ')
-    .find((row) => row.startsWith(`${name}=`))
-    ?.split('=')[1];
-}
+    .map((c) => c.split('='))
+    .filter((pair) => pair[0] === name)
+    .map((pair) => pair.slice(1).join('='))
+    .shift();
 
-function getCustomerToken() {
-  // Adobe storefront auth drop-in cookie
+const getCustomerToken = () => {
   const cookieToken = getCookie('auth_dropin_user_token');
-  if (cookieToken) return decodeURIComponent(cookieToken);
+  const decodedCookie = cookieToken ? decodeURIComponent(cookieToken) : null;
 
-  // optional fallbacks if you store it elsewhere
   return (
-    window.localStorage.getItem('auth_dropin_user_token') ||
-    window.localStorage.getItem('customerToken') ||
-    null
+    decodedCookie
+    || window.localStorage.getItem('auth_dropin_user_token')
+    || window.localStorage.getItem('customerToken')
+    || null
   );
-}
+};
 
-async function fetchRewardsBalance(token) {
+const fetchRewardsBalance = async (token) => {
   const res = await fetch(GRAPHQL_ENDPOINT, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
       authorization: `Bearer ${token}`,
-      // If your setup requires store headers, add them here, e.g.:
-      // store: 'default',
-      // 'magento-store-code': 'main_website_store',
     },
     body: JSON.stringify({ query: REWARDS_QUERY }),
-    credentials: 'include',
+    // Avoid credentials include (causes your CORS credentials error)
+    credentials: 'omit',
   });
 
   const json = await res.json();
 
-  if (json.errors?.length) {
+  if (json.errors && json.errors.length) {
     throw new Error(json.errors.map((e) => e.message).join(' | '));
   }
 
-  return json?.data?.customer?.reward_points?.balance ?? null;
-}
+  return (
+    (json.data
+      && json.data.customer
+      && json.data.customer.reward_points
+      && json.data.customer.reward_points.balance)
+    || null
+  );
+};
 
-function formatApproxMoney(balance) {
-  const value = balance?.money?.value;
-  const currency = balance?.money?.currency;
+const formatApprox = (balance) => {
+  const value = balance && balance.money && balance.money.value;
+  const currency = balance && balance.money && balance.money.currency;
+
   if (value === undefined || value === null || !currency) return '';
   return `≈ ${value} ${currency}`;
-}
+};
+
+const el = (tag, className, text) => {
+  const n = document.createElement(tag);
+  if (className) n.className = className;
+  if (text !== undefined) n.textContent = text;
+  return n;
+};
 
 export default async function decorate(block) {
-  const cfg = readBlockConfig(block);
+  const cfg = readConfig(block);
 
-  // clear authored table content
   block.textContent = '';
-  block.classList.add('reward-balance');
+  block.classList.add('commerce-rewards-tile');
 
-  const card = document.createElement('div');
-  card.className = 'reward-balance__card';
+  const card = el('div', 'commerce-rewards-tile__card');
+  const title = el('div', 'commerce-rewards-tile__title', cfg.title);
 
-  const title = document.createElement('div');
-  title.className = 'reward-balance__title';
-  title.textContent = cfg.title;
+  const status = el('div', 'commerce-rewards-tile__status', 'Loading…');
+  const points = el('div', 'commerce-rewards-tile__points', '');
+  const approx = el('div', 'commerce-rewards-tile__approx', '');
 
-  const body = document.createElement('div');
-  body.className = 'reward-balance__body';
-
-  const status = document.createElement('div');
-  status.className = 'reward-balance__status';
-  status.textContent = 'Loading…';
-
-  const points = document.createElement('div');
-  points.className = 'reward-balance__points';
-
-  const approx = document.createElement('div');
-  approx.className = 'reward-balance__approx';
-
-  body.append(status, points, approx);
-  card.append(title, body);
+  card.append(title, status, points, approx);
   block.append(card);
 
   const token = getCustomerToken();
@@ -145,11 +128,9 @@ export default async function decorate(block) {
     }
 
     status.textContent = '';
-    points.textContent = `${balance.points ?? 0} pts`;
-    approx.textContent = cfg.showMoney ? formatApproxMoney(balance) : '';
+    points.textContent = `${balance.points || 0} pts`;
+    approx.textContent = cfg.showMoney ? formatApprox(balance) : '';
   } catch (e) {
     status.textContent = 'Couldn’t load reward points.';
-    // Uncomment for debugging:
-    // approx.textContent = String(e.message || e);
   }
 }
