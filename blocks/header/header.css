@@ -871,3 +871,120 @@ header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button:hover,
 header nav .nav-sections > ul > li > a:hover {
   opacity: 0.9;
 }
+
+/* ========================================================================== */
+/* Nav hover + dropdown theming (Postcode red)                                */
+/* ========================================================================== */
+
+:root {
+  --pl-red: #e30027;
+}
+
+/* Ensure top bar is red */
+header .nav-wrapper {
+  background-color: var(--pl-red);
+}
+
+/* ----------------------------- */
+/* TOP NAV LINKS (desktop)       */
+/* ----------------------------- */
+
+/* Remove the default "gray pill" hover background */
+@media (min-width: 900px) {
+  header nav .nav-sections .default-content-wrapper > ul > li:hover,
+  header nav .nav-sections .nav-drop[aria-expanded='true'] {
+    background-color: transparent;
+  }
+
+  /* Make links white */
+  header nav .nav-sections .default-content-wrapper > ul > li > a {
+    color: #fff;
+  }
+
+  /* Clean hover: slight white tint + underline */
+  header nav .nav-sections .default-content-wrapper > ul > li > a:hover {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+    text-decoration-color: rgba(255, 255, 255, 0.9);
+  }
+
+  /* Optional: for the active/open menu item show a subtle bottom indicator */
+  header nav .nav-sections .nav-drop[aria-expanded='true'] > a,
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > a {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+  }
+}
+
+/* ----------------------------- */
+/* DROPDOWN PANEL (desktop)      */
+/* ----------------------------- */
+
+@media (min-width: 900px) {
+  /* the big panel wrapper */
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] .submenu-wrapper {
+    background-color: var(--pl-red);
+  }
+
+  /* all dropdown links/text white */
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] .submenu-wrapper,
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] .submenu-wrapper a,
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] .submenu-wrapper p,
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] .submenu-wrapper li {
+    color: #fff;
+  }
+
+  /* dropdown item hover */
+  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] .submenu-wrapper a:hover {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+  }
+
+  /* If you still see the little triangle caret, make it red too */
+  header nav .nav-sections .default-content-wrapper > ul > li ul::before {
+    border-bottom-color: var(--pl-red);
+  }
+}
+
+/* ----------------------------- */
+/* MOBILE MENU / SUBMENUS        */
+/* ----------------------------- */
+
+@media (max-width: 899px) {
+  /* mobile menu background when expanded */
+  header .nav-wrapper.active,
+  header .nav-wrapper:has(nav[aria-expanded='true']) {
+    background-color: var(--pl-red);
+  }
+
+  /* left panel body (sections) red + white text */
+  header nav[aria-expanded='true'] {
+    background-color: var(--pl-red);
+  }
+
+  header nav[aria-expanded='true'] .nav-sections,
+  header nav[aria-expanded='true'] .nav-sections a,
+  header nav[aria-expanded='true'] .nav-sections li {
+    color: #fff;
+  }
+
+  /* submenu overlay panel in mobile */
+  header nav .nav-sections ul > li.nav-drop.active .submenu-wrapper,
+  header nav .nav-sections ul > li.nav-drop .submenu-header {
+    background: var(--pl-red);
+  }
+
+  header nav .nav-sections ul > li.nav-drop .submenu-header .back-link {
+    color: #fff;
+  }
+
+  /* remove gray hover on mobile too */
+  header nav .nav-sections ul li a:hover {
+    text-decoration: underline;
+    text-underline-offset: 6px;
+    text-decoration-thickness: 2px;
+  }
+}
