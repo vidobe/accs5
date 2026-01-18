@@ -162,7 +162,7 @@ li.nav-drop img {
 }
 
 header nav .nav-brand img {
-  width: 128px;
+  width: 80px;
   height: auto;
 }
 
@@ -770,3 +770,4 @@ li
   max-width: 15rem;
   max-height: 15rem;
 }
+
