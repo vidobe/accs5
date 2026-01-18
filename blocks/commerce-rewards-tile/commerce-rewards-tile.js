@@ -14,7 +14,11 @@ const REWARDS_QUERY = `
 `;
 
 const DEFAULTS = {
-  title: 'Reward points',
+  title: 'Tokens',
+  subtitleLoading: 'Loading…',
+  subtitleSignedOut: 'Sign in to view your balance',
+  subtitleNoBalance: 'No reward points available',
+  subtitleError: 'Couldn’t load reward points',
   showMoney: true,
 };
 
@@ -58,7 +62,6 @@ const fetchRewardsBalance = async (token) => {
       authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ query: REWARDS_QUERY }),
-    // Avoid credentials include (fixes your allow-credentials error)
     credentials: 'omit',
   });
 
@@ -75,19 +78,57 @@ const fetchRewardsBalance = async (token) => {
     || null;
 };
 
-const formatApprox = (balance) => {
+const formatSubtitle = (balance, showMoney) => {
+  const points = (balance && balance.points) || 0;
+
+  if (!showMoney) return `${points} pts`;
+
   const value = balance && balance.money && balance.money.value;
   const currency = balance && balance.money && balance.money.currency;
+  const hasMoney = value !== undefined && value !== null && currency;
 
-  if (value === undefined || value === null || !currency) return '';
-  return `≈ ${value} ${currency}`;
+  return hasMoney ? `${points} pts (≈ ${value} ${currency})` : `${points} pts`;
 };
 
-const el = (tag, className, text) => {
-  const n = document.createElement(tag);
-  if (className) n.className = className;
-  if (text !== undefined) n.textContent = text;
-  return n;
+const createPrizeIcon = () => {
+  const wrapper = document.createElement('div');
+
+  wrapper.innerHTML = `
+    <svg
+      viewBox="0 0 24 24"
+      width="28"
+      height="28"
+      aria-hidden="true"
+      focusable="false"
+      style="display:block"
+    >
+      <path
+        fill="#f5c518"
+        stroke="none"
+        d="M12 2.5
+           L14.95 8.35
+           L21.4 9.25
+           L16.7 13.75
+           L17.9 20.15
+           L12 17
+           L6.1 20.15
+           L7.3 13.75
+           L2.6 9.25
+           L9.05 8.35
+           Z"
+      />
+    </svg>
+  `;
+  return wrapper;
+};
+
+
+const findReturnsTile = () => {
+  const leaf = [...document.querySelectorAll('*')]
+    .filter((el) => el.childElementCount === 0)
+    .find((el) => (el.textContent || '').trim() === 'Returns');
+
+  return leaf ? leaf.closest('a') : null;
 };
 
 export default async function decorate(block) {
@@ -96,19 +137,62 @@ export default async function decorate(block) {
   block.textContent = '';
   block.classList.add('commerce-rewards-tile');
 
-  const card = el('div', 'commerce-rewards-tile__card');
-  const title = el('div', 'commerce-rewards-tile__title', cfg.title);
+  const placeholder = document.createElement('div');
+  placeholder.textContent = 'Loading…';
+  block.append(placeholder);
 
-  const status = el('div', 'commerce-rewards-tile__status', 'Loading…');
-  const points = el('div', 'commerce-rewards-tile__points', '');
-  const approx = el('div', 'commerce-rewards-tile__approx', '');
+  const returnsTile = await new Promise((resolve) => {
+    const start = Date.now();
+    const maxMs = 8000;
 
-  card.append(title, status, points, approx);
-  block.append(card);
+    const tick = () => {
+      const found = findReturnsTile();
+      if (found) return resolve(found);
+      if (Date.now() - start > maxMs) return resolve(null);
+      return window.setTimeout(tick, 200);
+    };
+
+    tick();
+  });
+
+  if (!returnsTile) {
+    placeholder.textContent = 'Couldn’t find account tiles.';
+    return;
+  }
+
+const rewardsTile = returnsTile.cloneNode(true);
+rewardsTile.classList.add('commerce-rewards-tile--prize');
+rewardsTile.setAttribute('data-commerce-rewards-tile', 'true');
+rewardsTile.href = '/customer/reward-points';
+  
+
+  // ✅ Robust icon swap: replace the FIRST svg in the tile
+  const existingIconSvg = rewardsTile.querySelector('svg');
+  const newIconSvg = createPrizeIcon().querySelector('svg');
+  if (existingIconSvg && newIconSvg) {
+    existingIconSvg.replaceWith(newIconSvg);
+  }
+
+  const titleNode = [...rewardsTile.querySelectorAll('*')]
+    .filter((el) => el.childElementCount === 0)
+    .find((el) => (el.textContent || '').trim() === 'Returns');
+
+  if (titleNode) titleNode.textContent = cfg.title;
+
+  const leafs = [...rewardsTile.querySelectorAll('*')].filter((el) => el.childElementCount === 0);
+  const titleIndex = titleNode ? leafs.indexOf(titleNode) : -1;
+  const subtitleNode = titleIndex >= 0
+    ? leafs.slice(titleIndex + 1).find((n) => (n.textContent || '').trim().length)
+    : null;
+
+  if (subtitleNode) subtitleNode.textContent = cfg.subtitleLoading;
+
+  returnsTile.insertAdjacentElement('afterend', rewardsTile);
+  placeholder.remove();
 
   const token = getCustomerToken();
   if (!token) {
-    status.textContent = 'Sign in to view your balance.';
+    if (subtitleNode) subtitleNode.textContent = cfg.subtitleSignedOut;
     return;
   }
 
@@ -116,14 +200,12 @@ export default async function decorate(block) {
     const balance = await fetchRewardsBalance(token);
 
     if (!balance) {
-      status.textContent = 'No reward points available.';
+      if (subtitleNode) subtitleNode.textContent = cfg.subtitleNoBalance;
       return;
     }
 
-    status.textContent = '';
-    points.textContent = `${balance.points || 0} pts`;
-    approx.textContent = cfg.showMoney ? formatApprox(balance) : '';
+    if (subtitleNode) subtitleNode.textContent = formatSubtitle(balance, cfg.showMoney);
   } catch (e) {
-    status.textContent = 'Couldn’t load reward points.';
+    if (subtitleNode) subtitleNode.textContent = cfg.subtitleError;
   }
 }

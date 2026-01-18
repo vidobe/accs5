@@ -1,0 +1,48 @@
+.commerce-rewards-checkout__panel {
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--color-background, #fff);
+  margin: 12px 0;
+}
+
+.commerce-rewards-checkout__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.commerce-rewards-checkout__title {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.commerce-rewards-checkout__desc {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.commerce-rewards-checkout__status {
+  margin-top: 8px;
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.commerce-rewards-checkout__row {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.commerce-rewards-checkout__checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.commerce-rewards-checkout__icon svg {
+  display: block;
+}

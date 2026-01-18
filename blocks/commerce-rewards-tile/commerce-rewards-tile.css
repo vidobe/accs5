@@ -1,5 +1,5 @@
 .commerce-rewards-tile__card {
-  border: 1px solid var(--color-border, #e5e5e5);
+  border: 1px solid var(--color-border, #e52f2f);
   border-radius: 12px;
   padding: 14px 16px;
   background: var(--color-background, #fff);
@@ -27,4 +27,24 @@
   margin-top: 4px;
   font-size: 14px;
   opacity: 0.8;
+}
+
+/* Scope ONLY to the rewards tile */
+.commerce-rewards-tile--prize svg {
+  width: 28px;       /* was 24px */
+  height: 28px;
+  color: #f5c518;    /* warm reward yellow */
+}
+
+/* Optional: slightly stronger on hover (feels premium) */
+.commerce-rewards-tile--prize:hover svg {
+  color: #e6b800;
+}
+
+/* Ensure alignment stays identical */
+.commerce-rewards-tile--prize .account-tile__icon,
+.commerce-rewards-tile--prize svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
