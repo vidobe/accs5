@@ -1,0 +1,50 @@
+.commerce-rewards-tile {
+  border: 1px solid var(--color-neutral-300);
+  border-radius: var(--spacing-small);
+  padding: var(--spacing-medium);
+  background-color: var(--color-white);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--spacing-medium);
+}
+
+.rewards-tile-content h3 {
+  margin: 0 0 var(--spacing-small) 0;
+  font-size: var(--type-heading-3-font-size);
+  color: var(--color-neutral-900);
+}
+
+.rewards-balance {
+  display: flex;
+  align-items: baseline;
+  margin-bottom: var(--spacing-small);
+}
+
+.balance-amount {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  margin-right: var(--spacing-xsmall);
+}
+
+.balance-currency {
+  font-size: var(--type-body-1-font-size);
+  color: var(--color-neutral-700);
+}
+
+.rewards-description {
+  margin: 0;
+  font-size: var(--type-body-2-font-size);
+  color: var(--color-neutral-600);
+}
+
+.rewards-tile-loading,
+.rewards-tile-error {
+  text-align: center;
+  padding: var(--spacing-medium);
+}
+
+.rewards-tile-loading p,
+.rewards-tile-error p {
+  margin: 0;
+  color: var(--color-neutral-600);
+}
