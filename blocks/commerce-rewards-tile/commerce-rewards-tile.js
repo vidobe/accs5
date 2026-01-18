@@ -1,89 +1,155 @@
-import {
-  CORE_FETCH_GRAPHQL,
-  checkIsAuthenticated,
-  CUSTOMER_LOGIN_PATH,
-  rootLink,
-} from '../../scripts/commerce.js';
+/**
+ * Authorable block: reward-balance
+ *
+ * Optional authoring rows:
+ * | reward-balance |
+ * |---|
+ * | title | Reward points |
+ * | showMoney | true |
+ */
+
+const GRAPHQL_ENDPOINT =
+  'https://na1-sandbox.api.commerce.adobe.com/GR9ME1ZbVW5pKKUTNwdvfE/graphql';
+
+const DEFAULTS = {
+  title: 'Reward points',
+  showMoney: true,
+};
+
+const REWARDS_QUERY = `
+  query RewardsBalance {
+    customer {
+      reward_points {
+        balance {
+          points
+          money { value currency }
+        }
+      }
+    }
+  }
+`;
+
+function readBlockConfig(block) {
+  const config = { ...DEFAULTS };
+  const rows = [...block.querySelectorAll(':scope > div')];
+
+  for (const row of rows) {
+    const cols = [...row.children];
+    if (cols.length < 2) continue;
+
+    const key = (cols[0].textContent || '').trim();
+    const val = (cols[1].textContent || '').trim();
+
+    if (!key) continue;
+
+    if (key === 'title') config.title = val || DEFAULTS.title;
+    if (key === 'showMoney') config.showMoney = val.toLowerCase() !== 'false';
+  }
+
+  return config;
+}
+
+function getCookie(name) {
+  return document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(`${name}=`))
+    ?.split('=')[1];
+}
+
+function getCustomerToken() {
+  // Adobe storefront auth drop-in cookie
+  const cookieToken = getCookie('auth_dropin_user_token');
+  if (cookieToken) return decodeURIComponent(cookieToken);
+
+  // optional fallbacks if you store it elsewhere
+  return (
+    window.localStorage.getItem('auth_dropin_user_token') ||
+    window.localStorage.getItem('customerToken') ||
+    null
+  );
+}
+
+async function fetchRewardsBalance(token) {
+  const res = await fetch(GRAPHQL_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${token}`,
+      // If your setup requires store headers, add them here, e.g.:
+      // store: 'default',
+      // 'magento-store-code': 'main_website_store',
+    },
+    body: JSON.stringify({ query: REWARDS_QUERY }),
+    credentials: 'include',
+  });
+
+  const json = await res.json();
+
+  if (json.errors?.length) {
+    throw new Error(json.errors.map((e) => e.message).join(' | '));
+  }
+
+  return json?.data?.customer?.reward_points?.balance ?? null;
+}
+
+function formatApproxMoney(balance) {
+  const value = balance?.money?.value;
+  const currency = balance?.money?.currency;
+  if (value === undefined || value === null || !currency) return '';
+  return `≈ ${value} ${currency}`;
+}
 
 export default async function decorate(block) {
-  console.log('Rewards Tile: Block decoration started', block);
+  const cfg = readBlockConfig(block);
 
-  if (!checkIsAuthenticated()) {
-    console.log('Rewards Tile: User not authenticated, redirecting');
-    window.location.href = rootLink(CUSTOMER_LOGIN_PATH);
+  // clear authored table content
+  block.textContent = '';
+  block.classList.add('reward-balance');
+
+  const card = document.createElement('div');
+  card.className = 'reward-balance__card';
+
+  const title = document.createElement('div');
+  title.className = 'reward-balance__title';
+  title.textContent = cfg.title;
+
+  const body = document.createElement('div');
+  body.className = 'reward-balance__body';
+
+  const status = document.createElement('div');
+  status.className = 'reward-balance__status';
+  status.textContent = 'Loading…';
+
+  const points = document.createElement('div');
+  points.className = 'reward-balance__points';
+
+  const approx = document.createElement('div');
+  approx.className = 'reward-balance__approx';
+
+  body.append(status, points, approx);
+  card.append(title, body);
+  block.append(card);
+
+  const token = getCustomerToken();
+  if (!token) {
+    status.textContent = 'Sign in to view your balance.';
     return;
   }
 
-  console.log('Rewards Tile: User authenticated, proceeding with GraphQL call');
-
-  // Create the tile container
-  const tile = document.createElement('div');
-  tile.classList.add('commerce-rewards-tile');
-
-  // Loading state
-  tile.innerHTML = `
-    <div class="rewards-tile-loading">
-      <p>Loading rewards points...</p>
-    </div>
-  `;
-
-  block.innerHTML = '';
-  block.appendChild(tile);
-
   try {
-    // GraphQL query for customer reward points
-    // Try multiple possible field names for reward points
-    const query = `
-      query {
-        customer {
-          reward_points {
-            balance
-            currency_amount
-          }
-          reward_points_balance {
-            balance
-            currency_amount
-          }
-        }
-      }
-    `;
+    const balance = await fetchRewardsBalance(token);
 
-    console.log('Rewards Tile: About to make GraphQL query');
-    const response = await CORE_FETCH_GRAPHQL.query(query);
-    console.log('Rewards Tile: GraphQL response received', response);
-
-    const rewardData = response?.data?.customer?.reward_points
-      || response?.data?.customer?.reward_points_balance;
-
-    if (rewardData) {
-      const { balance, currency_amount: currencyAmount } = rewardData;
-
-      tile.innerHTML = `
-        <div class="rewards-tile-content">
-          <h3>Rewards Points</h3>
-          <div class="rewards-balance">
-            <span class="balance-amount">${balance || 0}</span>
-            <span class="balance-currency">${currencyAmount || ''}</span>
-          </div>
-          <p class="rewards-description">Earn more points with every purchase!</p>
-        </div>
-      `;
-      console.log('Rewards Tile: Successfully displayed rewards data');
-    } else {
-      console.log('Rewards Tile: No reward data found in response');
-      tile.innerHTML = `
-        <div class="rewards-tile-content">
-          <h3>Rewards Points</h3>
-          <p>No rewards points available.</p>
-        </div>
-      `;
+    if (!balance) {
+      status.textContent = 'No reward points available.';
+      return;
     }
-  } catch (error) {
-    console.error('Rewards Tile: Error fetching rewards points:', error);
-    tile.innerHTML = `
-      <div class="rewards-tile-error">
-        <p>Unable to load rewards points. Please try again later.</p>
-      </div>
-    `;
+
+    status.textContent = '';
+    points.textContent = `${balance.points ?? 0} pts`;
+    approx.textContent = cfg.showMoney ? formatApproxMoney(balance) : '';
+  } catch (e) {
+    status.textContent = 'Couldn’t load reward points.';
+    // Uncomment for debugging:
+    // approx.textContent = String(e.message || e);
   }
 }

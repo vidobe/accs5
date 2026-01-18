@@ -1,50 +1,37 @@
-.commerce-rewards-tile {
-  border: 1px solid var(--color-neutral-300);
-  border-radius: var(--spacing-small);
-  padding: var(--spacing-medium);
-  background-color: var(--color-white);
-  box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
-  margin-bottom: var(--spacing-medium);
-}
-
-.rewards-tile-content h3 {
-  margin: 0 0 var(--spacing-small) 0;
-  font-size: var(--type-heading-3-font-size);
-  color: var(--color-neutral-900);
-}
-
-.rewards-balance {
-  display: flex;
-  align-items: baseline;
-  margin-bottom: var(--spacing-small);
-}
-
-.balance-amount {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--color-primary);
-  margin-right: var(--spacing-xsmall);
-}
-
-.balance-currency {
-  font-size: var(--type-body-1-font-size);
-  color: var(--color-neutral-700);
-}
-
-.rewards-description {
+.reward-balance {
   margin: 0;
-  font-size: var(--type-body-2-font-size);
-  color: var(--color-neutral-600);
 }
 
-.rewards-tile-loading,
-.rewards-tile-error {
-  text-align: center;
-  padding: var(--spacing-medium);
+.reward-balance__card {
+  border: 1px solid var(--color-border, #e5e5e5);
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--color-background, #fff);
 }
 
-.rewards-tile-loading p,
-.rewards-tile-error p {
-  margin: 0;
-  color: var(--color-neutral-600);
+.reward-balance__title {
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.25;
+  margin-bottom: 10px;
+}
+
+.reward-balance__body {
+  display: grid;
+  gap: 6px;
+}
+
+.reward-balance__status {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.reward-balance__points {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.reward-balance__approx {
+  font-size: 14px;
+  opacity: 0.8;
 }
