@@ -61,7 +61,7 @@ header nav[aria-expanded='true'] {
     gap: 0 32px;
     max-width: 1264px;
     padding: 10px 32px;
-    height: 65px;
+    height: 80px;
   }
 
   header nav .nav-sections {
@@ -677,6 +677,7 @@ header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg * {
 
 .overlay.show {
   display: block;
+  top: 20px;
 }
 
 @media (max-width: 899px) {
