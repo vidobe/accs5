@@ -61,7 +61,7 @@ header nav[aria-expanded='true'] {
     gap: 0 32px;
     max-width: 1264px;
     padding: 10px 32px;
-    height: 100px;
+    height: 65px;
   }
 
   header nav .nav-sections {
