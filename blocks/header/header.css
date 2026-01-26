@@ -55,11 +55,24 @@ header nav[aria-expanded='true'] {
 
 @media (min-width: 900px) {
   header nav {
-    display: flex;
-    justify-content: space-between;
-    gap: 0 32px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
     max-width: 1264px;
     padding: 0 32px;
+    gap: 0 32px;
+  }
+
+  header nav .nav-sections {
+    justify-self: start;
+  }
+
+  header nav .nav-brand {
+    justify-self: center;
+  }
+
+  header nav .nav-tools {
+    justify-self: end;
   }
 
   header nav[aria-expanded='true'] {
@@ -67,6 +80,7 @@ header nav[aria-expanded='true'] {
     overflow: visible;
   }
 }
+
 
 header nav p {
   margin: 0;
