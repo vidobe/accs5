@@ -407,10 +407,9 @@ header nav .nav-tools-wrapper > button {
   width: 40px;
 }
 
-header nav .nav-tools button.nav-cart-button,
+header nav .nav-tools button.nav-cart-button
 header nav .nav-tools button.nav-wishlist-button,
 header nav .nav-tools button.nav-search-button {
-  font-size: 0;
   background-image: none !important;
   background-repeat: no-repeat;
   background-position: center;
