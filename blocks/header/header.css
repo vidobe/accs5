@@ -21,6 +21,8 @@ header .nav-wrapper {
   z-index: 3;
   position: fixed;
   border-bottom: 1px solid var(--header-border-color);
+  top: 0;
+  left: 0;
 }
 
 header nav {
@@ -679,16 +681,16 @@ header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg * {
   display: block;
 }
 
-@media (max-width: 899px) {
-  header {
-    position: relative;
-  }
-
   @media (min-width: 900px) {
   .overlay {
     inset: 80px 0 0;
   }
 }
+
+@media (max-width: 899px) {
+  header {
+    position: relative;
+  }
 
   header .nav-wrapper.active,
   header .nav-wrapper:has(nav[aria-expanded='true']) {
