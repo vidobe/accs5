@@ -882,7 +882,7 @@ header nav .nav-sections > ul > li > a:hover {
 
 /* Ensure top bar is red */
 header .nav-wrapper {
-  background-color: var(--pl-red);
+  background-color: #000;
 }
 
 /* ----------------------------- */
