@@ -50,7 +50,7 @@ header nav[aria-expanded='true'] {
     'sections sections' 1fr
     'tools tools' var(--nav-height) / auto 1fr;
   overflow-y: auto;
-  min-height: 100dvh;
+  min-height: unset;
 }
 
 @media (min-width: 900px) {
