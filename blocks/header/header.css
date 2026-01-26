@@ -188,14 +188,14 @@ header nav .nav-sections ul > li:empty {
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] .submenu-wrapper {
-    background-color: var(--pl-red);
+    background-color: #000;
     box-sizing: border-box;
     left: 0;
     max-height: var(--desktop-panel-max-height);
     min-height: var(--desktop-panel-min-height);
     padding: var(--spacing-xbig);
     position: absolute;
-    top: var(--spacing-large);
+    top: 80px;
     width: 100%;
   }
 
