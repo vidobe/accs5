@@ -36,7 +36,9 @@
 }
 
 /* ========================= */
+
 /* CTA BUTTON (BOTTOM CENTER) */
+
 /* ========================= */
 
 .hero h1 > a {
@@ -45,12 +47,10 @@
   bottom: 48px;                 /* distance from bottom */
   transform: translateX(-50%);
   z-index: 2;
-
   background-color: #0a8f08;    /* green */
   color: #fff;
   padding: 16px 32px;
   border-radius: 8px;
-
   font-size: 18px;
   font-weight: 700;
   text-decoration: none;
@@ -58,7 +58,6 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
   box-shadow: 0 6px 0 #066906;  /* subtle depth */
 }
 
