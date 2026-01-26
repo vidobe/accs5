@@ -670,14 +670,16 @@ header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg * {
 .overlay {
   background-color: rgb(0 0 0 / 50%) !important;
   display: none;
-  inset: 0;
   position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: var(--nav-height); /* or 80px on desktop if you hardcode nav height there */
   z-index: 2;
 }
 
 .overlay.show {
   display: block;
-  top: 20px;
 }
 
 @media (max-width: 899px) {
