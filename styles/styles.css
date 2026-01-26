@@ -484,6 +484,6 @@ main[hidden] {
 .product-discovery-product-list {
   /* stylelint-disable custom-property-pattern */
   --imageHeight: 520 !important;
-  --imageWidth: 400 !important;
+  --imageWidth: 370 !important;
   /* stylelint-enable custom-property-pattern */
 }
