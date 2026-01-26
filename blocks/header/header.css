@@ -61,7 +61,7 @@ header nav[aria-expanded='true'] {
     gap: 0 32px;
     max-width: 1264px;
     padding: 10px 32px;
-    height: 100px;
+    height: 65px;
   }
 
   header nav .nav-sections {
@@ -682,6 +682,10 @@ header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg * {
 @media (max-width: 899px) {
   header {
     position: relative;
+    header nav[aria-expanded='true'] {
+    overflow-y: auto;
+    min-height: 100dvh;
+}
   }
 
   header .nav-wrapper.active,
