@@ -671,10 +671,7 @@ header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg * {
   background-color: rgb(0 0 0 / 50%) !important;
   display: none;
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  top: var(--nav-height); /* or 80px on desktop if you hardcode nav height there */
+  inset: var(--nav-height) 0 0 0;
   z-index: 2;
 }
 
@@ -686,6 +683,12 @@ header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg * {
   header {
     position: relative;
   }
+
+  @media (min-width: 900px) {
+  .overlay {
+    inset: 80px 0 0;
+  }
+}
 
   header .nav-wrapper.active,
   header .nav-wrapper:has(nav[aria-expanded='true']) {
