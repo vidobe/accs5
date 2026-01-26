@@ -21,48 +21,54 @@ document.querySelector('header').insertAdjacentElement('afterbegin', overlay);
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
     const nav = document.getElementById('nav');
+    if (!nav) return;
+
     const navSections = nav.querySelector('.nav-sections');
-    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
+    const navSectionExpanded = navSections?.querySelector('[aria-expanded="true"]');
+
     if (navSectionExpanded && isDesktop.matches) {
-      toggleAllNavSections(navSections);
+      toggleAllNavSections(navSections, false);
       overlay.classList.remove('show');
       navSectionExpanded.focus();
     } else if (!isDesktop.matches) {
-      toggleMenu(nav, navSections);
+      toggleMenu(nav, navSections, false);
       overlay.classList.remove('show');
-      nav.querySelector('button').focus();
+      nav.querySelector('button')?.focus();
       const navWrapper = document.querySelector('.nav-wrapper');
-      navWrapper.classList.remove('active');
+      navWrapper?.classList.remove('active');
     }
   }
 }
 
 function closeOnFocusLost(e) {
   const nav = e.currentTarget;
+  if (!nav) return;
+
   if (!nav.contains(e.relatedTarget)) {
     const navSections = nav.querySelector('.nav-sections');
-    const navSectionExpanded = navSections.querySelector('[aria-expanded="true"]');
+    const navSectionExpanded = navSections?.querySelector('[aria-expanded="true"]');
+
     if (navSectionExpanded && isDesktop.matches) {
       toggleAllNavSections(navSections, false);
       overlay.classList.remove('show');
     } else if (!isDesktop.matches) {
-      toggleMenu(nav, navSections, true);
+      toggleMenu(nav, navSections, false);
     }
   }
 }
 
 function openOnKeydown(e) {
   const focused = document.activeElement;
-  const isNavDrop = focused.className === 'nav-drop';
+  const isNavDrop = focused?.className === 'nav-drop';
   if (isNavDrop && (e.code === 'Enter' || e.code === 'Space')) {
     const dropExpanded = focused.getAttribute('aria-expanded') === 'true';
-    toggleAllNavSections(focused.closest('.nav-sections'));
+    toggleAllNavSections(focused.closest('.nav-sections'), false);
     focused.setAttribute('aria-expanded', dropExpanded ? 'false' : 'true');
   }
 }
 
 function focusNavSection() {
-  document.activeElement.addEventListener('keydown', openOnKeydown);
+  document.activeElement?.addEventListener('keydown', openOnKeydown);
 }
 
 /**
@@ -71,10 +77,11 @@ function focusNavSection() {
  * @param {Boolean} expanded Whether the element should be expanded or collapsed
  */
 function toggleAllNavSections(sections, expanded = false) {
+  if (!sections) return;
   sections
     .querySelectorAll('.nav-sections .default-content-wrapper > ul > li')
     .forEach((section) => {
-      section.setAttribute('aria-expanded', expanded);
+      section.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     });
 }
 
@@ -82,17 +89,32 @@ function toggleAllNavSections(sections, expanded = false) {
  * Toggles the entire nav
  * @param {Element} nav The container element
  * @param {Element} navSections The nav sections within the container element
- * @param {*} forceExpanded Optional param to force nav expand behavior when not null
+ * @param {Boolean|null} forceExpanded Optional param to force nav expanded/collapsed
  */
 function toggleMenu(nav, navSections, forceExpanded = null) {
-  const expanded = forceExpanded !== null ? !forceExpanded : nav.getAttribute('aria-expanded') === 'true';
+  if (!nav) return;
+
+  // Desired state: expanded=true means menu is open (mobile drawer open)
+  const expanded = forceExpanded !== null
+    ? forceExpanded
+    : nav.getAttribute('aria-expanded') === 'true';
+
   const button = nav.querySelector('.nav-hamburger button');
-  document.body.style.overflowY = expanded || isDesktop.matches ? '' : 'hidden';
-  nav.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-  toggleAllNavSections(navSections, expanded || isDesktop.matches ? 'false' : 'true');
-  button.setAttribute('aria-label', expanded ? 'Open navigation' : 'Close navigation');
+
+  // Apply state (NOT inverted)
+  nav.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+
+  // Only lock scroll when mobile menu is open
+  document.body.style.overflowY = (!isDesktop.matches && expanded) ? 'hidden' : '';
+
+  // On mobile: opening the menu should expand the section list
+  // On desktop: keep sections collapsed (hover handles open)
+  toggleAllNavSections(navSections, (!isDesktop.matches && expanded));
+
+  button?.setAttribute('aria-label', expanded ? 'Close navigation' : 'Open navigation');
+
   // enable nav dropdown keyboard accessibility
-  const navDrops = navSections.querySelectorAll('.nav-drop');
+  const navDrops = navSections?.querySelectorAll('.nav-drop') || [];
   if (isDesktop.matches) {
     navDrops.forEach((drop) => {
       if (!drop.hasAttribute('tabindex')) {
@@ -108,11 +130,9 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
     });
   }
 
-  // enable menu collapse on escape keypress
-  if (!expanded || isDesktop.matches) {
-    // collapse menu on escape press
+  // enable menu collapse on escape keypress / focus lost when something can be open
+  if (expanded || isDesktop.matches) {
     window.addEventListener('keydown', closeOnEscape);
-    // collapse menu on focus lost
     nav.addEventListener('focusout', closeOnFocusLost);
   } else {
     window.removeEventListener('keydown', closeOnEscape);
@@ -126,7 +146,7 @@ subMenuHeader.innerHTML = '<h5 class="back-link">All Categories</h5><hr />';
 
 /**
  * Sets up the submenu
- * @param {navSection} navSection The nav section element
+ * @param {Element} navSection The nav section element
  */
 function setupSubmenu(navSection) {
   if (navSection.querySelector('ul')) {
@@ -140,7 +160,7 @@ function setupSubmenu(navSection) {
     const header = subMenuHeader.cloneNode(true);
     const title = document.createElement('h6');
     title.classList.add('submenu-title');
-    title.textContent = label.textContent;
+    title.textContent = label?.textContent || '';
 
     wrapper.classList.add('submenu-wrapper');
     wrapper.appendChild(header);
@@ -175,7 +195,7 @@ export default async function decorate(block) {
   });
 
   const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
+  const brandLink = navBrand?.querySelector('.button');
   if (brandLink) {
     brandLink.className = '';
     brandLink.closest('.button-container').className = '';
@@ -188,14 +208,17 @@ export default async function decorate(block) {
       .forEach((navSection) => {
         if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
         setupSubmenu(navSection);
+
         navSection.addEventListener('click', (event) => {
           if (event.target.tagName === 'A') return;
           if (!isDesktop.matches) {
             navSection.classList.toggle('active');
           }
         });
+
         navSection.addEventListener('mouseenter', () => {
-          toggleAllNavSections(navSections);
+          toggleAllNavSections(navSections, false);
+
           if (isDesktop.matches) {
             if (!navSection.classList.contains('nav-drop')) {
               overlay.classList.remove('show');
@@ -218,14 +241,14 @@ export default async function decorate(block) {
      </div>
    `);
 
-  navTools.append(wishlist);
+  navTools?.append(wishlist);
 
-  const wishlistButton = navTools.querySelector('.nav-wishlist-button');
+  const wishlistButton = navTools?.querySelector('.nav-wishlist-button');
 
   const wishlistMeta = getMetadata('wishlist');
   const wishlistPath = wishlistMeta ? new URL(wishlistMeta, window.location).pathname : '/wishlist';
 
-  wishlistButton.addEventListener('click', () => {
+  wishlistButton?.addEventListener('click', () => {
     window.location.href = rootLink(wishlistPath);
   });
 
@@ -239,27 +262,20 @@ export default async function decorate(block) {
      </div>
    `);
 
-  navTools.append(minicart);
+  navTools?.append(minicart);
 
-  const minicartPanel = navTools.querySelector('.minicart-panel');
+  const minicartPanel = navTools?.querySelector('.minicart-panel');
+  const cartButton = navTools?.querySelector('.nav-cart-button');
 
-  const cartButton = navTools.querySelector('.nav-cart-button');
-
-  if (excludeMiniCartFromPaths.includes(window.location.pathname)) {
+  if (cartButton && excludeMiniCartFromPaths.includes(window.location.pathname)) {
     cartButton.style.display = 'none';
   }
 
-  /**
-   * Handles loading states for navigation panels with state management
-   *
-   * @param {HTMLElement} panel - The panel element to manage loading state for
-   * @param {HTMLElement} button - The button that triggers the panel
-   * @param {Function} loader - Async function to execute during loading
-   */
   async function withLoadingState(panel, button, loader) {
+    if (!panel) return;
     if (panel.dataset.loaded === 'true' || panel.dataset.loading === 'true') return;
 
-    button.setAttribute('aria-busy', 'true');
+    button?.setAttribute('aria-busy', 'true');
     panel.dataset.loading = 'true';
 
     try {
@@ -267,18 +283,17 @@ export default async function decorate(block) {
       panel.dataset.loaded = 'true';
     } finally {
       panel.dataset.loading = 'false';
-      button.removeAttribute('aria-busy');
+      button?.removeAttribute('aria-busy');
 
-      // Execute pending toggle if exists
       if (panel.dataset.pendingToggle === 'true') {
         // eslint-disable-next-line no-nested-ternary
-        const pendingState = panel.dataset.pendingState === 'true' ? true : (panel.dataset.pendingState === 'false' ? false : undefined);
+        const pendingState = panel.dataset.pendingState === 'true'
+          ? true
+          : (panel.dataset.pendingState === 'false' ? false : undefined);
 
-        // Clear pending flags
         panel.removeAttribute('data-pending-toggle');
         panel.removeAttribute('data-pending-state');
 
-        // Execute the pending toggle
         const show = pendingState ?? !panel.classList.contains('nav-tools-panel--show');
         panel.classList.toggle('nav-tools-panel--show', show);
       }
@@ -286,9 +301,9 @@ export default async function decorate(block) {
   }
 
   function togglePanel(panel, state) {
-    // If loading is in progress, queue the toggle action
+    if (!panel) return;
+
     if (panel.dataset.loading === 'true') {
-      // Store the pending toggle action
       panel.dataset.pendingToggle = 'true';
       panel.dataset.pendingState = state !== undefined ? state.toString() : '';
       return;
@@ -298,8 +313,8 @@ export default async function decorate(block) {
     panel.classList.toggle('nav-tools-panel--show', show);
   }
 
-  // Lazy loading for mini cart fragment
   async function loadMiniCartFragment() {
+    if (!minicartPanel) return;
     await withLoadingState(minicartPanel, cartButton, async () => {
       const miniCartMeta = getMetadata('mini-cart');
       const miniCartPath = miniCartMeta ? new URL(miniCartMeta, window.location).pathname : '/mini-cart';
@@ -309,6 +324,8 @@ export default async function decorate(block) {
   }
 
   async function toggleMiniCart(state) {
+    if (!minicartPanel) return;
+
     if (state) {
       await loadMiniCartFragment();
       const { publishShoppingCartViewEvent } = await import('@dropins/storefront-cart/api.js');
@@ -318,17 +335,18 @@ export default async function decorate(block) {
     togglePanel(minicartPanel, state);
   }
 
-  cartButton.addEventListener('click', () => toggleMiniCart(!minicartPanel.classList.contains('nav-tools-panel--show')));
+  cartButton?.addEventListener('click', () => {
+    toggleMiniCart(!minicartPanel?.classList.contains('nav-tools-panel--show'));
+  });
 
   // Cart Item Counter
   events.on('cart/data', (data) => {
-    // preload mini cart fragment if user has a cart
     if (data) loadMiniCartFragment();
 
     if (data?.totalQuantity) {
-      cartButton.setAttribute('data-count', data.totalQuantity);
+      cartButton?.setAttribute('data-count', data.totalQuantity);
     } else {
-      cartButton.removeAttribute('data-count');
+      cartButton?.removeAttribute('data-count');
     }
   }, { eager: true });
 
@@ -343,21 +361,20 @@ export default async function decorate(block) {
   </div>
   `);
 
-  navTools.append(searchFragment);
+  navTools?.append(searchFragment);
 
-  const searchPanel = navTools.querySelector('.nav-search-panel');
-  const searchButton = navTools.querySelector('.nav-search-button');
-  const searchForm = searchPanel.querySelector('#search-bar-form');
-  const searchResult = searchPanel.querySelector('.search-bar-result');
+  const searchPanel = navTools?.querySelector('.nav-search-panel');
+  const searchButton = navTools?.querySelector('.nav-search-button');
+  const searchForm = searchPanel?.querySelector('#search-bar-form');
+  const searchResult = searchPanel?.querySelector('.search-bar-result');
 
   async function toggleSearch(state) {
     const pageSize = 4;
 
-    if (state) {
+    if (state && searchPanel) {
       await withLoadingState(searchPanel, searchButton, async () => {
         await import('../../scripts/initializers/search.js');
 
-        // Load search components in parallel
         const [
           { search },
           { render },
@@ -376,7 +393,7 @@ export default async function decorate(block) {
           scope: 'popover',
           routeProduct: ({ urlKey, sku }) => getProductLink(urlKey, sku),
           onSearchResult: (results) => {
-            searchResult.style.display = results.length > 0 ? 'block' : 'none';
+            if (searchResult) searchResult.style.display = results.length > 0 ? 'block' : 'none';
           },
           slots: {
             ProductImage: (ctx) => {
@@ -395,7 +412,6 @@ export default async function decorate(block) {
               });
             },
             Footer: async (ctx) => {
-              // View all results button
               const viewAllResultsWrapper = document.createElement('div');
 
               const viewAllResultsButton = await UI.render(Button, {
@@ -416,7 +432,7 @@ export default async function decorate(block) {
           },
         })(searchResult);
 
-        searchForm.addEventListener('submit', (e) => {
+        searchForm?.addEventListener('submit', (e) => {
           e.preventDefault();
           const query = e.target.search.value;
           if (query.length) {
@@ -433,9 +449,7 @@ export default async function decorate(block) {
               return;
             }
 
-            if (phrase.length < 3) {
-              return;
-            }
+            if (phrase.length < 3) return;
 
             search({
               phrase,
@@ -453,37 +467,33 @@ export default async function decorate(block) {
     if (state) searchForm?.querySelector('input')?.focus();
   }
 
-  searchButton.addEventListener('click', () => toggleSearch(!searchPanel.classList.contains('nav-tools-panel--show')));
+  searchButton?.addEventListener('click', () => {
+    toggleSearch(!searchPanel?.classList.contains('nav-tools-panel--show'));
+  });
 
-  navTools.querySelector('.nav-search-button').addEventListener('click', () => {
+  navTools?.querySelector('.nav-search-button')?.addEventListener('click', () => {
     if (isDesktop.matches) {
-      toggleAllNavSections(navSections);
+      toggleAllNavSections(navSections, false);
       overlay.classList.remove('show');
     }
   });
 
   // Close panels when clicking outside
   document.addEventListener('click', (e) => {
-    // Check if undo is enabled for mini cart
-    const miniCartElement = document.querySelector(
-      '[data-block-name="commerce-mini-cart"]',
-    );
+    const miniCartElement = document.querySelector('[data-block-name="commerce-mini-cart"]');
     const undoEnabled = miniCartElement
       && (miniCartElement.textContent?.includes('undo-remove-item')
         || miniCartElement.innerHTML?.includes('undo-remove-item'));
 
-    // For mini cart: if undo is enabled, be more restrictive about when to close
     const shouldCloseMiniCart = undoEnabled
-      ? !minicartPanel.contains(e.target)
-      && !cartButton.contains(e.target)
-      && !e.target.closest('header')
-      : !minicartPanel.contains(e.target) && !cartButton.contains(e.target);
+      ? !minicartPanel?.contains(e.target)
+        && !cartButton?.contains(e.target)
+        && !e.target.closest('header')
+      : !minicartPanel?.contains(e.target) && !cartButton?.contains(e.target);
 
-    if (shouldCloseMiniCart) {
-      toggleMiniCart(false);
-    }
+    if (shouldCloseMiniCart) toggleMiniCart(false);
 
-    if (!searchPanel.contains(e.target) && !searchButton.contains(e.target)) {
+    if (!searchPanel?.contains(e.target) && !searchButton?.contains(e.target)) {
       toggleSearch(false);
     }
   });
@@ -495,7 +505,7 @@ export default async function decorate(block) {
 
   navWrapper.addEventListener('mouseout', (e) => {
     if (isDesktop.matches && !nav.contains(e.relatedTarget)) {
-      toggleAllNavSections(navSections);
+      toggleAllNavSections(navSections, false);
       overlay.classList.remove('show');
     }
   });
@@ -512,16 +522,21 @@ export default async function decorate(block) {
   hamburger.innerHTML = `<button type="button" aria-controls="nav" aria-label="Open navigation">
       <span class="nav-hamburger-icon"></span>
     </button>`;
+
   hamburger.addEventListener('click', () => {
-    navWrapper.classList.toggle('active');
-    overlay.classList.toggle('show');
-    toggleMenu(nav, navSections);
+    const next = nav.getAttribute('aria-expanded') !== 'true';
+    navWrapper.classList.toggle('active', next);
+    overlay.classList.toggle('show', next);
+    toggleMenu(nav, navSections, next);
   });
+
   nav.prepend(hamburger);
-  nav.setAttribute('aria-expanded', 'false');
-  // prevent mobile nav behavior on window resize
-  toggleMenu(nav, navSections, isDesktop.matches);
-  isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, isDesktop.matches));
+
+  // Force initial state: collapsed everywhere
+  toggleMenu(nav, navSections, false);
+
+  // On breakpoint change: collapse (safe default)
+  isDesktop.addEventListener('change', () => toggleMenu(nav, navSections, false));
 
   renderAuthCombine(
     navSections,
