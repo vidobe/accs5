@@ -13,7 +13,8 @@
 :root {
   --topbar-height: 34px;
   --topbar-bg: #fff;
-  --topbar-fg: #fff;
+  --topbar-fg: #111;
+  --topbar-border: #e5e5e5;
 }
 
 /* Container (inside fixed nav-wrapper) */
@@ -24,6 +25,7 @@ header .nav-topbar {
   color: var(--topbar-fg);
   border-bottom: 1px solid var(--topbar-border);
   box-sizing: border-box;
+  background-color: white;
 }
 
 @media (min-width: 900px) {
