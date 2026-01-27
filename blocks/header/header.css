@@ -6,110 +6,82 @@
   --desktop-panel-max-height: 600px;
 
 /* ============================================================
-   TOP LOCALE BAR (Country / Language)
-   Matches Orient Watch style
+   ORIENT-STYLE LOCALE BAR (grey + small typography)
    ============================================================ */
 
 :root {
-  --topbar-height: 34px;
-  --topbar-bg: #fff;
-  --topbar-fg: #111;
-  --topbar-border: #e5e5e5;
+  --topbar-height: 28px;              /* slimmer */
+  --topbar-bg: #3a3a3a;               /* dark grey */
+  --topbar-fg: #cfcfcf;               /* light grey text */
+  --topbar-border: #2a2a2a;
 }
 
-/* Container (inside fixed nav-wrapper) */
 header .nav-topbar {
-  display: none; /* hidden on mobile */
-  height: var(--topbar-height);
   background-color: var(--topbar-bg);
   color: var(--topbar-fg);
   border-bottom: 1px solid var(--topbar-border);
-  box-sizing: border-box;
-  background-color: white;
 }
 
-@media (min-width: 900px) {
-  header .nav-topbar {
-    display: block;
-  }
-}
-
-/* Inner alignment */
+/* tighter vertical rhythm */
 header .nav-topbar-inner {
-  max-width: 1264px;
-  height: 100%;
-  margin: 0 auto;
   padding: 0 32px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-sizing: border-box;
+  gap: 12px;
 }
 
-/* Country / language blocks */
-header .nav-topbar-inner > div {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Labels */
+/* label text (COUNTRY / LANGUAGE) */
 header .nav-topbar label {
-  font: var(--type-body-2-default-font);
-  letter-spacing: var(--type-body-2-default-letter-spacing);
-  font-size: 12px;
-  color: #333;
-  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #bdbdbd;
 }
 
-/* Selects */
+/* selects styled as text-like controls */
 header .nav-topbar select {
-  font: var(--type-body-2-default-font);
-  letter-spacing: var(--type-body-2-default-letter-spacing);
-  height: 26px;
-  padding: 0 8px;
-  border-radius: 4px;
-  border: 1px solid #cfcfcf;
-  background-color: #fff;
-  color: #111;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  height: 22px;
+  padding: 0 4px;
+  background: transparent;
+  color: #e0e0e0;
+  border: none;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
   cursor: pointer;
 }
 
+/* subtle hover, no boxy UI */
 header .nav-topbar select:hover {
-  border-color: #999;
+  border-bottom-color: #888;
 }
 
+/* focus without breaking minimal look */
 header .nav-topbar select:focus-visible {
-  outline: 2px solid #000;
-  outline-offset: 2px;
+  outline: none;
+  border-bottom-color: #fff;
+}
+
+/* dropdown arrow color */
+header .nav-topbar select option {
+  color: #111;
 }
 
 /* ============================================================
-   FIXED HEADER STACKING (topbar + main nav)
+   HEADER STACKING FIX (since height changed)
    ============================================================ */
 
-/* Push main nav below topbar */
-@media (min-width: 900px) {
-  header nav {
-    margin-top: var(--topbar-height);
-  }
-}
-
-/* Body offset (prevents content jump under fixed header) */
 @media (min-width: 900px) {
   body {
     padding-top: calc(80px + var(--topbar-height));
   }
-}
 
-@media (max-width: 899px) {
-  body {
-    padding-top: var(--nav-height);
+  header nav {
+    margin-top: var(--topbar-height);
   }
-}
 
-/* Overlay + panels start below both bars */
-@media (min-width: 900px) {
   .overlay {
     inset: calc(80px + var(--topbar-height)) 0 0;
   }
@@ -118,7 +90,7 @@ header .nav-topbar select:focus-visible {
     top: calc(var(--nav-height) + var(--topbar-height));
   }
 }
-
+  
   /* Theme tokens (header only) */
   --pl-red: #e30027;
   --header-bg: var(--pl-red);
