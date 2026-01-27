@@ -487,3 +487,15 @@ main[hidden] {
   --imageWidth: 400 !important;
   /* stylelint-enable custom-property-pattern */
 }
+
+/* Fix: recommendations wrapper collapses to height:0 */
+.product-recommendations-wrapper {
+  display: flow-root; /* contains floats => parent gets height */
+}
+
+/* Defensive: ensure dropin containers are block-level */
+.product-recommendations-wrapper .product-recommendations,
+.product-recommendations-wrapper [data-dropin-container] {
+  display: block;
+  width: 100%;
+}
