@@ -17,7 +17,7 @@
 }
 
 header .nav-topbar {
-  background-color: var(--topbar-bg);
+  background-color: #4a4a4a;
   color: var(--topbar-fg);
   border-bottom: 1px solid var(--topbar-border);
 }
@@ -25,7 +25,10 @@ header .nav-topbar {
 /* tighter vertical rhythm */
 header .nav-topbar-inner {
   padding: 0 32px;
-  gap: 12px;
+  gap: 24px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
 }
 
 /* label text (COUNTRY / LANGUAGE) */
@@ -960,3 +963,4 @@ header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg * {
   max-width: 15rem;
   max-height: 15rem;
 }
+
