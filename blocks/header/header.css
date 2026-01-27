@@ -874,14 +874,3 @@ header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg * {
   max-width: 15rem;
   max-height: 15rem;
 }
-
-header .nav-wrapper::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background-color: rgb(255 255 255 / 20%);
-  pointer-events: none;
-}
