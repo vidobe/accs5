@@ -59,6 +59,7 @@
   flex-direction: column;
   gap: 12px;
   min-height: 200px;
+  text-align: left;
 }
 
 /* Title (first heading) */
@@ -73,10 +74,8 @@
   color: #0b4aa2;
 
   /* Clamp */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
+  display: block;
+  overflow: visible;
 }
 
 /* Description */
@@ -88,9 +87,7 @@
   opacity: 0.9;
 
   /* Clamp */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  display: block;
   overflow: hidden;
 }
 
@@ -100,6 +97,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  text-align: left;
 }
 
 .cards .cards-card-tag {
