@@ -50,14 +50,31 @@ const LOCALES = [
 ];
 
 function resolveTargetUrl(countryCode, langCode) {
-  const url = new URL(window.location.href);
+  const { origin, pathname } = window.location;
 
-  // If you prefer to keep the URL clean, you can remove these later and instead
-  // route by pathname or hostname. For now this is simplest and demo-friendly.
-  url.searchParams.set('country', countryCode);
-  url.searchParams.set('lang', langCode);
+  // Remove existing locale prefix if present
+  const cleanPath = pathname.replace(/^\/(de|nl|en)(\/|$)/, '/');
 
-  return url.toString();
+  // Germany → Deutsch
+  if (countryCode === 'DE' && langCode === 'de') {
+    return `${origin}/de${cleanPath}`;
+  }
+
+  // Netherlands
+  if (countryCode === 'NL' && langCode === 'nl') {
+    return `${origin}/nl${cleanPath}`;
+  }
+  if (countryCode === 'NL' && langCode === 'en') {
+    return `${origin}/en${cleanPath}`;
+  }
+
+  // United Kingdom (default, no prefix)
+  if (countryCode === 'GB' && langCode === 'en') {
+    return `${origin}${cleanPath}`;
+  }
+
+  // Fallback
+  return `${origin}${cleanPath}`;
 }
 
 function createLocaleTopBar() {
