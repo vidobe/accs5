@@ -18,6 +18,136 @@ const overlay = document.createElement('div');
 overlay.classList.add('overlay');
 document.querySelector('header').insertAdjacentElement('afterbegin', overlay);
 
+/**
+ * Locale / Market Topbar (Country + Language)
+ * - Desktop only (CSS hides on < 900px)
+ * - Persists selection via localStorage
+ * - Navigates using query params by default: ?country=NL&lang=nl
+ *   -> Replace resolveTargetUrl() if you want path-based or store-view based routing.
+ */
+const LOCALES = [
+  {
+    country: 'United Kingdom',
+    countryCode: 'GB',
+    languages: [{ label: 'English', code: 'en' }],
+  },
+  {
+    country: 'Netherlands',
+    countryCode: 'NL',
+    languages: [
+      { label: 'Dutch', code: 'nl' },
+      { label: 'English', code: 'en' },
+    ],
+  },
+  {
+    country: 'Germany',
+    countryCode: 'DE',
+    languages: [
+      { label: 'Deutsch', code: 'de' },
+      { label: 'English', code: 'en' },
+    ],
+  },
+];
+
+function resolveTargetUrl(countryCode, langCode) {
+  const url = new URL(window.location.href);
+
+  // If you prefer to keep the URL clean, you can remove these later and instead
+  // route by pathname or hostname. For now this is simplest and demo-friendly.
+  url.searchParams.set('country', countryCode);
+  url.searchParams.set('lang', langCode);
+
+  return url.toString();
+}
+
+function createLocaleTopBar() {
+  const topbar = document.createElement('div');
+  topbar.className = 'nav-topbar';
+
+  const inner = document.createElement('div');
+  inner.className = 'nav-topbar-inner';
+  topbar.append(inner);
+
+  const countryWrap = document.createElement('div');
+  countryWrap.className = 'nav-topbar-field nav-topbar-country';
+
+  const langWrap = document.createElement('div');
+  langWrap.className = 'nav-topbar-field nav-topbar-language';
+
+  const countryLabel = document.createElement('label');
+  countryLabel.textContent = 'Country';
+  countryLabel.setAttribute('for', 'locale-country');
+
+  const langLabel = document.createElement('label');
+  langLabel.textContent = 'Language';
+  langLabel.setAttribute('for', 'locale-language');
+
+  const countrySelect = document.createElement('select');
+  countrySelect.id = 'locale-country';
+  countrySelect.name = 'country';
+
+  const langSelect = document.createElement('select');
+  langSelect.id = 'locale-language';
+  langSelect.name = 'language';
+
+  // populate country options
+  LOCALES.forEach((c) => {
+    const opt = document.createElement('option');
+    opt.value = c.countryCode;
+    opt.textContent = c.country;
+    countrySelect.append(opt);
+  });
+
+  function setLanguages(countryCode, preferredLang) {
+    const entry = LOCALES.find((c) => c.countryCode === countryCode) || LOCALES[0];
+    langSelect.innerHTML = '';
+
+    entry.languages.forEach((l) => {
+      const opt = document.createElement('option');
+      opt.value = l.code;
+      opt.textContent = l.label;
+      langSelect.append(opt);
+    });
+
+    const exists = entry.languages.some((l) => l.code === preferredLang);
+    langSelect.value = exists ? preferredLang : entry.languages[0].code;
+  }
+
+  const url = new URL(window.location.href);
+  const initCountry = url.searchParams.get('country')
+    || localStorage.getItem('country')
+    || 'GB';
+
+  const initLang = url.searchParams.get('lang')
+    || localStorage.getItem('lang')
+    || 'en';
+
+  countrySelect.value = initCountry;
+  setLanguages(initCountry, initLang);
+
+  function persistAndNavigate() {
+    localStorage.setItem('country', countrySelect.value);
+    localStorage.setItem('lang', langSelect.value);
+    window.location.assign(resolveTargetUrl(countrySelect.value, langSelect.value));
+  }
+
+  countrySelect.addEventListener('change', () => {
+    // When switching country: keep english if supported, else first language
+    setLanguages(countrySelect.value, langSelect.value || 'en');
+    persistAndNavigate();
+  });
+
+  langSelect.addEventListener('change', () => {
+    persistAndNavigate();
+  });
+
+  countryWrap.append(countryLabel, countrySelect);
+  langWrap.append(langLabel, langSelect);
+  inner.append(countryWrap, langWrap);
+
+  return topbar;
+}
+
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
     const nav = document.getElementById('nav');
@@ -500,6 +630,10 @@ export default async function decorate(block) {
 
   const navWrapper = document.createElement('div');
   navWrapper.className = 'nav-wrapper';
+
+  // ✅ Insert the desktop-only locale topbar above the nav
+  navWrapper.append(createLocaleTopBar());
+
   navWrapper.append(nav);
   block.append(navWrapper);
 
