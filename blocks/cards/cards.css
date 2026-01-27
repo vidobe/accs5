@@ -85,6 +85,7 @@
   line-height: 1.45;
   color: #111;
   opacity: 0.9;
+  text-align: left;
 
   /* Clamp */
   display: block;
