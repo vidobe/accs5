@@ -1,7 +1,6 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
 
-const DEFAULT_TAG = 'Winnaarsverhalen';
-const DEFAULT_DATE = '16 januari 2026';
+const DEFAULT_TAG = 'Orient Watch';
 
 const createMetaRow = () => {
   const meta = document.createElement('div');
