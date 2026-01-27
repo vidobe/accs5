@@ -12,9 +12,6 @@
   --header-fg: #fff;
   --header-hover-underline-color: rgb(255 255 255 / 90%);
   --header-tools-panel-fg: initial;
-
-  /* NEW: divider line color */
-  --header-divider-color: rgb(255 255 255 / 18%);
 }
 
 /* header and nav layout */
@@ -23,24 +20,9 @@ header .nav-wrapper {
   width: 100%;
   z-index: 3;
   position: fixed;
-  border-bottom: 0;
+  border-bottom: 1px solid var(--header-border-color);
   top: 0;
   left: 0;
-
-  /* NEW: needed so ::after positions correctly */
-  box-sizing: border-box;
-}
-
-/* NEW: full-width divider line under nav + logo + icons */
-header .nav-wrapper::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background-color: var(--header-divider-color);
-  pointer-events: none;
 }
 
 header nav {
@@ -57,10 +39,6 @@ header nav {
   padding: 0 24px;
   font-family: var(--type-base-font-family);
   color: var(--header-fg);
-
-  /* NEW: keeps content above the divider line */
-  position: relative;
-  z-index: 1;
 }
 
 header nav a,
@@ -84,12 +62,8 @@ header nav[aria-expanded='true'] {
     align-items: center;
     gap: 0 32px;
     max-width: 1264px;
-
-    /* Keep your current height */
-    height: 80px;
-
-    /* Slight padding like Orient */
     padding: 10px 32px;
+    height: 80px;
   }
 
   header nav .nav-sections {
@@ -292,24 +266,6 @@ header nav .nav-sections ul > li:empty {
   }
 }
 
-@media (min-width: 900px) {
-  header nav .nav-sections ul > li:first-child > :is(a, p) {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  header nav .nav-sections ul > li:first-child > :is(a, p)::before {
-    content: '';
-    width: 16px;
-    height: 16px;
-    display: block;
-    background-color: currentcolor;
-    mask: url('../../icons/home.svg') no-repeat center;
-    mask-size: contain;
-  }
-}
-
 /* brand */
 header nav .nav-brand {
   min-width: 128px;
@@ -451,11 +407,9 @@ header nav .nav-tools-wrapper > button {
   width: 40px;
 }
 
-/* FIXED: missing comma previously */
-header nav .nav-tools button.nav-cart-button,
+header nav .nav-tools button.nav-cart-button
 header nav .nav-tools button.nav-wishlist-button,
 header nav .nav-tools button.nav-search-button {
-  font-size: 0;
   background-image: none !important;
   background-repeat: no-repeat;
   background-position: center;
@@ -726,7 +680,7 @@ header nav .dropdown-wrapper.nav-tools-wrapper .nav-dropdown-button svg * {
   display: block;
 }
 
-@media (min-width: 900px) {
+  @media (min-width: 900px) {
   .overlay {
     inset: 80px 0 0;
   }
