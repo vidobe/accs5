@@ -21,9 +21,13 @@ import {
   loadErrorPage,
 } from './commerce.js';
 
-// Universal Editor instrumentation
-if (window.location.hostname.includes('ue.da.live')) {
-  import('https://universal-editor.adobe.com/universal-editor.js');
+// Universal Editor instrumentation (lint-safe)
+if (window.location.hostname.endsWith('ue.da.live')) {
+  const ueScript = document.createElement('script');
+  ueScript.src = 'https://universal-editor.adobe.com/universal-editor.js';
+  ueScript.type = 'module';
+  ueScript.defer = true;
+  document.head.appendChild(ueScript);
 }
 
 /**
