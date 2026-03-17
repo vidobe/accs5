@@ -20,6 +20,7 @@ header .nav-topbar {
   background-color: #4a4a4a;
   color: var(--topbar-fg);
   border-bottom: 1px solid var(--topbar-border);
+  background-color: black;
 }
 
 /* tighter vertical rhythm */
