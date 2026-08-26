@@ -1,5 +1,15 @@
 {
   "project": "My Project",
   "editUrlLabel": "Document Authoring",
-  "editUrlPattern": "https://da.live/edit#/{{org}}/{{site}}{{pathname}}"
+  "editUrlPattern": "https://da.live/edit#/{{org}}/{{site}}{{pathname}}",
+  "plugins": [
+    {
+      "id": "commerce-picker",
+      "title": "Commerce Picker",
+      "url": "https://da.live/commerce#/vidobe/accs5",
+      "isPalette": true,
+      "paletteRect": "top: 54px; left: 7px; bottom: 7px; width: 350px;",
+      "environments": ["da-edit"]
+    }
+  ]
 }
